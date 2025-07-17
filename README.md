@@ -45,8 +45,6 @@ The script's core logic depends on a list of "funnel" paths where indexing rules
     // --- CONFIGURATION ---
     // A list of "funnel" paths on get-honey.ai that should use inverted logic.
     const funnelPaths = [
-        '/funnel-new',
-        '/quickdate-honey-black',
         // ...add other funnels from your documentation here
     ];
     // -----------------
