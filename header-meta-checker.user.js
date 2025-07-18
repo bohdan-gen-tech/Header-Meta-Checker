@@ -2,7 +2,7 @@
 // @name         Header/Meta Checker
 // @namespace    http://tampermonkey.net/
 // @version      2025.07.18.2
-// @description  For funnels, checks robots.txt and header. For other pages, checks meta and header.
+// @description  For funnels, checks robots.txt and header. For other pages, checks meta and header. Full code in Confluence.
 // @author       Bohdan S.
 // @match        *://*/*
 // @grant        GM_xmlhttpRequest
