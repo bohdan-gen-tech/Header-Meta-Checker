@@ -7,6 +7,8 @@
 // @match        *://*/*
 // @grant        GM_xmlhttpRequest
 // @connect      *
+// @updateURL    https://raw.githubusercontent.com/bohdan-gen-tech/Header-Meta-Checker/main/header-meta-checker.user.js
+// @downloadURL  https://raw.githubusercontent.com/bohdan-gen-tech/Header-Meta-Checker/main/header-meta-checker.user.js
 // ==/UserScript==
 
 (function() {
