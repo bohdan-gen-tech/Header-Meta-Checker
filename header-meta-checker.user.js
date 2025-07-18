@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Experimental Header/Meta Checker
+// @name         Header/Meta Checker
 // @namespace    http://tampermonkey.net/
-// @version      2025.07.17.1
-// @description  Checks meta tag reliably and TRIES to parse header content via re-fetch (unreliable method).
+// @version      2025.07.18.2
+// @description  For funnels, checks robots.txt and header. For other pages, checks meta and header. No console output.
 // @author       Bohdan S.
 // @match        *://*/*
 // @grant        GM_xmlhttpRequest
@@ -20,6 +20,7 @@
 
     const robotsTxtUrl = ''; // <-- add robotxt path
     // -----------------
+
     /**
      * The main function that orchestrates all checks.
      */
@@ -27,6 +28,7 @@
         const hostname = window.location.hostname;
         const pathname = window.location.pathname;
         const isFunnel = hostname === 'get-honey.ai' && funnelPaths.includes(pathname);
+
         let leftPanelResult;
         if (isFunnel) {
             // For funnels, the left panel shows the robots.txt check result.
@@ -35,12 +37,13 @@
             // For all other pages, the left panel shows the meta tag check result.
             leftPanelResult = checkMetaTag();
         }
+
         // The right panel ALWAYS shows the header check result.
         const rightPanelResult = await checkHeaderTag();
+
         displaySplitBanner(leftPanelResult, rightPanelResult);
-        logToConsole(leftPanelResult.message, leftPanelResult.status);
-        logToConsole(rightPanelResult.message, rightPanelResult.status);
     }
+
     /**
      * Determines which color logic to apply.
      * @returns {boolean} - True for standard logic, false for inverted logic.
@@ -48,6 +51,7 @@
     function shouldUseStandardLogic() {
         const hostname = window.location.hostname;
         const pathname = window.location.pathname;
+
         if (hostname === 'get-honey.ai') {
             // Standard logic applies if it's on get-honey.ai AND it's NOT a funnel.
             return !funnelPaths.includes(pathname);
@@ -55,6 +59,7 @@
         // Inverted logic for all other websites.
         return false;
     }
+
     /**
      * Checks robots.txt to see if a given path is disallowed.
      * @param {string} pathToCheck - The URL pathname to check.
@@ -68,6 +73,7 @@
                 onload: function(response) {
                     const robotsTxtContent = response.responseText;
                     const disallowPattern = new RegExp(`^Disallow:\\s*${pathToCheck}(/)?\\s*$`, "im");
+
                     if (disallowPattern.test(robotsTxtContent)) {
                         // Correct for a funnel: it IS disallowed.
                         resolve({
@@ -88,6 +94,7 @@
             });
         });
     }
+
     /**
      * Checks the document's <head> for a <meta name="robots"> tag.
      * @returns {{message: string, status: string}}
@@ -95,6 +102,7 @@
     function checkMetaTag() {
         const metaTag = document.querySelector('meta[name="robots"]');
         let message, status;
+
         if (metaTag) {
             const content = metaTag.getAttribute('content');
             message = `Meta: content="${content}"`;
@@ -108,6 +116,7 @@
         }
         return { message, status };
     }
+
     /**
      * TRIES to check the X-Robots-Tag header by making a new HEAD request.
      * @returns {Promise<{message: string, status: string}>}
@@ -121,6 +130,7 @@
                     let message, status;
                     const headerMatch = response.responseHeaders.match(/x-robots-tag:\s*(.*)/i);
                     const isStandard = shouldUseStandardLogic();
+
                     if (headerMatch) {
                         const headerValue = headerMatch[1].trim();
                         message = `Header: x-robots-tag: ${headerValue}`;
@@ -138,22 +148,28 @@
             });
         });
     }
+
     // --- Display and Helper Functions ---
+
     function displaySplitBanner(left, right) {
         const container = document.createElement('div');
         container.style.cssText = "position:fixed; bottom:20px; left:20px; z-index:99999; display:flex; box-shadow:0 4px 12px rgba(0,0,0,0.4); border-radius:8px; overflow:hidden; font-family:Arial, sans-serif; font-size:12px;";
+
         const leftDiv = document.createElement('div');
         leftDiv.textContent = left.message;
         leftDiv.style.cssText = `padding:10px 12px; color:white; background-color:${getStatusColor(left.status)};`;
+
         const rightDiv = document.createElement('div');
         rightDiv.textContent = right.message;
         rightDiv.style.cssText = `padding:10px 12px; color:white; background-color:${getStatusColor(right.status)}; border-left:2px solid rgba(255,255,255,0.5);`;
+
         const closeButton = createCloseButton(container);
         container.appendChild(leftDiv);
         container.appendChild(rightDiv);
         container.appendChild(closeButton);
         document.body.appendChild(container);
     }
+
     function createCloseButton(container) {
         const closeButton = document.createElement('span');
         closeButton.textContent = '✖';
@@ -161,6 +177,7 @@
         closeButton.onclick = () => container.remove();
         return closeButton;
     }
+
     function getStatusColor(status) {
         switch (status) {
             case 'ok': return '#388E3C'; // Green
@@ -169,11 +186,7 @@
             default: return '#616161';
         }
     }
-    function logToConsole(message, status) {
-        let style = 'font-weight:bold; padding:2px 5px; border-radius:3px; color:white;';
-        style += `background-color:${getStatusColor(status)};`;
-        const icon = status === 'ok' ? '✅' : (status === 'bad' ? '❌' : '⚠️');
-        console.log(`%c${icon} ${message}`, style);
-    }
+
     window.addEventListener('load', runChecks);
+
 })();
