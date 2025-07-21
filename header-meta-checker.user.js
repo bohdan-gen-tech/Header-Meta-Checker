@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Header/Meta Checker
 // @namespace    http://tampermonkey.net/
-// @version      2025.07.18.2
+// @version      2025.07.21.2
 // @description  For funnels, checks robots.txt and header. For other pages, checks meta and header. Full code in Confluence.
 // @author       Bohdan S.
 // @match        *://*/*
@@ -24,25 +24,34 @@
     // -----------------
 
     /**
+     * Normalizes a URL path by removing a trailing slash if it exists.
+     * @param {string} path - The original path.
+     * @returns {string} The normalized path.
+     */
+    function getNormalizedPathname() {
+        let pathname = window.location.pathname;
+        if (pathname.length > 1 && pathname.endsWith('/')) {
+            return pathname.slice(0, -1);
+        }
+        return pathname;
+    }
+
+    /**
      * The main function that orchestrates all checks.
      */
     async function runChecks() {
         const hostname = window.location.hostname;
-        const pathname = window.location.pathname;
+        const pathname = getNormalizedPathname(); // Use normalized path
         const isFunnel = hostname === 'get-honey.ai' && funnelPaths.includes(pathname);
 
         let leftPanelResult;
         if (isFunnel) {
-            // For funnels, the left panel shows the robots.txt check result.
             leftPanelResult = await checkRobotsTxtForPath(pathname);
         } else {
-            // For all other pages, the left panel shows the meta tag check result.
             leftPanelResult = checkMetaTag();
         }
 
-        // The right panel ALWAYS shows the header check result.
         const rightPanelResult = await checkHeaderTag();
-
         displaySplitBanner(leftPanelResult, rightPanelResult);
     }
 
@@ -52,13 +61,11 @@
      */
     function shouldUseStandardLogic() {
         const hostname = window.location.hostname;
-        const pathname = window.location.pathname;
+        const pathname = getNormalizedPathname(); // Use normalized path
 
         if (hostname === 'get-honey.ai') {
-            // Standard logic applies if it's on get-honey.ai AND it's NOT a funnel.
             return !funnelPaths.includes(pathname);
         }
-        // Inverted logic for all other websites.
         return false;
     }
 
@@ -77,17 +84,9 @@
                     const disallowPattern = new RegExp(`^Disallow:\\s*${pathToCheck}(/)?\\s*$`, "im");
 
                     if (disallowPattern.test(robotsTxtContent)) {
-                        // Correct for a funnel: it IS disallowed.
-                        resolve({
-                            message: `robots.txt: Disallowed`,
-                            status: 'ok'
-                        });
+                        resolve({ message: `robots.txt: Disallowed`, status: 'ok' });
                     } else {
-                        // Incorrect for a funnel: it is NOT disallowed.
-                        resolve({
-                            message: `robots.txt: NOT Disallowed`,
-                            status: 'bad'
-                        });
+                        resolve({ message: `robots.txt: NOT Disallowed`, status: 'bad' });
                     }
                 },
                 onerror: function() {
