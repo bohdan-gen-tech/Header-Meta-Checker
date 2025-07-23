@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Header/Meta Checker
 // @namespace    http://tampermonkey.net/
-// @version      2025.07.23.3
-// @description  Added new funnels. Fix color funnel logic on panel. For funnels, checks robots.txt and header. For other pages, checks meta and header. With fallback logic for misconfigured funnels.
+// @version      2025.07.23.4
+// @description  Added new funnels. Fix color funnel logic on panel. Exclude some routes. For funnels, checks robots.txt and header. For other pages, checks meta and header. With fallback logic for misconfigured funnels.
 // @author       Bohdan S.
 // @match        *://*/*
 // @exclude      https://form-v2.charge-auth.com/*
