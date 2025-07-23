@@ -5,6 +5,8 @@
 // @description  Added new funnels. Fix color funnel logic on panel. For funnels, checks robots.txt and header. For other pages, checks meta and header. With fallback logic for misconfigured funnels.
 // @author       Bohdan S.
 // @match        *://*/*
+// @exclude      https://form-v2.charge-auth.com/*
+// @exclude      https://pay.google.com/*
 // @grant        GM_xmlhttpRequest
 // @connect      *
 // @updateURL    https://raw.githubusercontent.com/bohdan-gen-tech/Header-Meta-Checker/main/header-meta-checker.user.js
