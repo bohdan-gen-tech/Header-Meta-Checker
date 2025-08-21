@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Header/Meta Checker
 // @namespace    http://tampermonkey.net/
-// @version      2025.08.22
+// @version      2025.08.22.1
 // @description  Won't run in iframe. Added new funnels. Fix color funnel logic on panel. Exclude some routes. For funnels, checks robots.txt and header. For other pages, checks meta and header. With fallback logic for misconfigured funnels.
 // @author       Bohdan S.
 // @match        *://*/*
