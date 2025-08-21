@@ -1,12 +1,10 @@
 // ==UserScript==
 // @name         Header/Meta Checker
 // @namespace    http://tampermonkey.net/
-// @version      2025.07.23.4
-// @description  Added new funnels. Fix color funnel logic on panel. Exclude some routes. For funnels, checks robots.txt and header. For other pages, checks meta and header. With fallback logic for misconfigured funnels.
+// @version      2025.08.22
+// @description  Won't run in iframe. Added new funnels. Fix color funnel logic on panel. Exclude some routes. For funnels, checks robots.txt and header. For other pages, checks meta and header. With fallback logic for misconfigured funnels.
 // @author       Bohdan S.
 // @match        *://*/*
-// @exclude      https://form-v2.charge-auth.com/*
-// @exclude      https://pay.google.com/*
 // @grant        GM_xmlhttpRequest
 // @connect      *
 // @updateURL    https://raw.githubusercontent.com/bohdan-gen-tech/Header-Meta-Checker/main/header-meta-checker.user.js
@@ -15,6 +13,10 @@
 
 (function() {
     'use strict';
+
+    if (window.self !== window.top) {
+        return;
+    }
 
     // --- CONFIGURATION ---
     // A list of "funnel" paths on get-honey.ai that should use inverted logic.
